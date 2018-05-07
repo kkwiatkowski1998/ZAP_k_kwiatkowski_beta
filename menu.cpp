@@ -2,14 +2,11 @@
 #include <cstdlib>
 #include <string>
 #include <ctime>
+#include <fstream>
 
 #include <mech.h>
 #include <menu.h>
 #include <plansza.h>
-
-using namespace std;
-
-
 
 using namespace std;
 
@@ -24,11 +21,15 @@ void menu::okno_powitalne()
 
 void menu::start_exit()
 {
+    plik.open("instrukcja.txt");
+
+    system("cls");
+
     menu::okno_powitalne();
 
-    cout << "WERSJA 2, dodanie wyboru ilosci symboli w linii do zwyciestwa, cofania ruchu oraz gracz vs komputer" << endl;
+    cout << "WERSJA 2, dodanie wyboru ilosci symboli w linii do zwyciestwa, gracz vs komputer" << endl << endl;
 
-    cout << "Nowa gra,  wybierz 1" << endl << "Wyjscie, wybierz 0"  << endl;
+    cout << "Nowa gra,  wybierz 1" << endl << "Wyjscie, wybierz 0"  <<endl << "Instrukcja, wybierz i" << endl;
     cin >> wybor;
     switch (wybor)
     {
@@ -38,9 +39,24 @@ void menu::start_exit()
     case '0':
         exit(0);
         break;
-    case 't':
-       // menu::test();
-        break;
+    case 'i':
+        system ("cls");
+        getline(plik, napis);
+        cout << napis << endl;
+        while(!plik.eof())
+        {
+            getline(plik, napis);
+            cout << napis << endl;
+        }
+        plik.close();
+        cout << "Aby wrocic do menu, wybierz 0" << endl;
+        cin >> wybor;
+        switch(wybor)
+        case '0':
+            menu::okno_powitalne();
+            menu::start_exit();
+            break;
+
     default:
         system("cls");
         menu::okno_powitalne();
@@ -52,7 +68,7 @@ void menu::gracz_komputer()
 {
     system("cls");
     menu::okno_powitalne();
-    cout << "Dwoch graczy, wybierz 1" << endl << "Jeden gracz, wybierz 0" << endl;
+    cout << "Dwoch graczy, wybierz 1" << endl << "Jeden gracz, wybierz 0" << endl << "Dane testowe, wybierz t" << endl;
     cin >> wybor;
     switch (wybor)
     {
@@ -61,6 +77,9 @@ void menu::gracz_komputer()
         break;
     case '0':
         menu::gracz_vs_komputer();
+        break;
+    case 't':
+        menu::test();
         break;
 
     default:
@@ -86,9 +105,13 @@ void menu::gracz_vs_komputer()
 
 void menu::test()
 {
+    MECH.test = 1;
     MECH.dane_testowe();
     MECH.pelna_mechanika_test();
 }
+
+
+
 
 // PARAMETRY GRACZY I PLANSZY
 
@@ -203,6 +226,7 @@ void menu::kolejna_runda()
         MECH.powtorka();
         break;
     case '0':
+        MECH.usuwanie_dynamicznych();
         exit(0);
         break;
     default:
@@ -230,5 +254,6 @@ void menu::remis()
     MECH.liczba_ruchow = 0;
     menu::kolejna_runda();
 }
+
 
 

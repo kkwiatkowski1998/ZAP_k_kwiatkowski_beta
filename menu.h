@@ -4,7 +4,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <string>
-
+#include <fstream>
 
 using namespace std;
 
@@ -15,6 +15,8 @@ private:
         char wybor;
         string nazwa;
         char symbol;
+        ifstream plik;
+        string napis;
 
 public:
 

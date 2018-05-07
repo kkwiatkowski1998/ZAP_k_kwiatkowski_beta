@@ -46,13 +46,20 @@ void mech::nowa_plansza()
     }
 }
 
+void mech::usuwanie_dynamicznych()
+{
+    for (int i = 0; i < rozmiar_planszy; i++)
+        delete [] tablica[i];
+    delete [] tablica;
+}
+
 void mech::drukuj_plansze()
 {
-    for (int i = 0; i < mech::rozmiar_planszy; i++)
+    for (int i = 0; i < rozmiar_planszy; i++)
     {
-        for (int j = 0; j < mech::rozmiar_planszy; j++)
+        for (int j = 0; j < rozmiar_planszy; j++)
         {
-            cout << mech::tablica[i][j] << '\t';
+            cout << tablica[i][j] << '\t';
         }
         cout << endl << endl;
     }
@@ -71,7 +78,6 @@ void mech::dane_graczy()
     {
         gracz2.nick = "KOMPUTER";
     }
-
 
     zmienna_char = MENU.znak(gracz1.nick);
     switch (zmienna_char)
@@ -108,7 +114,7 @@ void mech::pelna_mechanika_gg()
     mech::wymiary_planszy();
     mech::ilosc_symboli();
     mech::nowa_plansza();
-    mech::rozgrywka_gg(gracz1, gracz2, rozmiar_planszy, tablica);
+    mech::rozgrywka_gg();
 
 }
 void mech::dane_testowe()
@@ -119,17 +125,20 @@ void mech::dane_testowe()
     gracz2.znak = 'X';
     gracz1.nick = "KOLKO";
     gracz2.nick = "KRZYZYK";
-    rozmiar_planszy = 3;
-    ilosc_symboli_linia = 3;
+
 }
 void mech::pelna_mechanika_test()
 {
+    mech::dane_testowe();
+    mech::wymiary_planszy();
+    mech::ilosc_symboli();
     mech::nowa_plansza();
     mech::rozgrywka_test();
 }
 
 void mech::rozgrywka_test()
 {
+    liczba_ruchow = 0;
     srand(time(0));
     for(int i = 0; i < rozmiar_planszy*rozmiar_planszy; i++)
     {
@@ -139,68 +148,60 @@ void mech::rozgrywka_test()
 
         if(gracz1.wartosc == 1)
         {
-            zaczynajacy = gracz1;
+            gracz_pomocniczy = gracz1;
         }
         else if(gracz1.wartosc == 0)
         {
-            zaczynajacy = gracz2;
+            gracz_pomocniczy = gracz2;
         }
 
-        drukuj_plansze();
-        x = 1+rand()%(rozmiar_planszy);
-        y = 1+rand()%(rozmiar_planszy);
-        while(tablica[x-1][y-1]!=('_'))
+        mech::drukuj_plansze();
+        x = rand()%(rozmiar_planszy);
+        y = rand()%(rozmiar_planszy);
+        while(tablica[x][y]!=('_'))
         {
-            x = 1+rand()%(rozmiar_planszy-1);
-            y = 1+rand()%(rozmiar_planszy-1);
+            x = rand()%(rozmiar_planszy);
+            y = rand()%(rozmiar_planszy);
         }
-        tablica[x-1][y-1] = zaczynajacy.znak;
+        tablica[x][y] = gracz_pomocniczy.znak;
 
         gracz_pomocniczy.wartosc = gracz1.wartosc;
         gracz1.wartosc = gracz2.wartosc;
         gracz2.wartosc = gracz_pomocniczy.wartosc;
 
-        suma = mech::sprawdzenie(tablica);
-        wynik();
+        liczba_ruchow++;
+        mech::wynik();
     }
 }
 
-void mech::rozgrywka_gg(zawodnik gracz1, zawodnik gracz2, int rozmiar_planszy, char **&tablica)
+
+void mech::rozgrywka_gg()
 {
     for(int i = 0; i < rozmiar_planszy*rozmiar_planszy; i++)
     {
         system("cls");
-
         MENU.okno_powitalne();
+        drukuj_plansze();
 
         if(gracz1.wartosc == 1)
         {
-            zaczynajacy = gracz1;
+            gracz_pomocniczy = gracz1;
         }
         else if(gracz1.wartosc == 0)
         {
-            zaczynajacy = gracz2;
+            gracz_pomocniczy = gracz2;
         }
 
-        drukuj_plansze();
+        cout << gracz_pomocniczy.nick << ", twoj ruch "<< gracz_pomocniczy.znak << endl;
 
-        cout << zaczynajacy.nick << ", twoj ruch "<< zaczynajacy.znak << endl;
-        cout << liczba_ruchow << endl;
-
-        mech::wspolrzedne_ruchu(x, y, rozmiar_planszy);
-        while(tablica[x-1][y-1]!=('_'))
-        {
-            cout << "Pole zajete!" << endl;
-            mech::wspolrzedne_ruchu(x, y, rozmiar_planszy);
-        }
-        tablica[x-1][y-1] = zaczynajacy.znak;
+        mech::wspolrzedne_ruchu(gracz_pomocniczy);
 
         gracz_pomocniczy.wartosc = gracz1.wartosc;
         gracz1.wartosc = gracz2.wartosc;
         gracz2.wartosc = gracz_pomocniczy.wartosc;
 
-        suma = mech::sprawdzenie(tablica);
-        wynik();
+        liczba_ruchow++;
+        mech::wynik();
     }
 }
 
@@ -220,18 +221,25 @@ void mech::powtorka()
         gracz2.wartosc = 1;
     }
 
+    if(test == false)
+    {
+        if(gvsg == true)
+        {
+            mech::rozgrywka_gg();
+        }
+        if(gvsg == false)
+        {
+            mech::rozgrywka_gvsk();
+        }
+    }
+    if(test == true)
+    {
+        mech::rozgrywka_test();
+    }
 
-    if(gvsg == true)
-    {
-        mech::rozgrywka_gg(gracz1, gracz2, rozmiar_planszy, tablica);
-    }
-    if(gvsg == false)
-    {
-        mech::rozgrywka_gvsk();
-    }
 }
 
-void mech::wspolrzedne_ruchu(int &x, int &y, int rozmiar_planszy)
+void mech::wspolrzedne_ruchu(zawodnik gracz)
 {
     cout << "Podaj wspolrzedna x " ;
     cin >> x;
@@ -248,65 +256,65 @@ void mech::wspolrzedne_ruchu(int &x, int &y, int rozmiar_planszy)
         cout << "Podaj wspolrzedna y " ;
         cin >> y;
     }
+
+    if(tablica[x-1][y-1]!='_')
+    {
+        cout << "Pole zajete!" << endl;
+        mech::wspolrzedne_ruchu(gracz);
+    }
+    tablica[x-1][y-1] = gracz.znak;
+
 }
 
-void mech::analiza_ruchu()
-{
+//bool mech::analiza_ruchu()
+//{
+//    mech::wyp_tab_pom();
 
-    for(int i = 0; i < rozmiar_planszy; i++)
-    {
-        for (int j = 0; j < rozmiar_planszy; j++)
-        {
-            if(tablica_pom[i][j] == '_')
-            {
-                tablica_pom[i][j] = gracz_pomocniczy_2.znak;
-                suma = mech::sprawdzenie(tablica_pom);
+//    for(int i = 0; i < rozmiar_planszy; i++)
+//    {
+//        for (int j = 0; j < rozmiar_planszy; j++)
+//        {
+//            if(tablica_pom[i][j] == '_')
+//            {
 
-                if(abs(suma) == ilosc_symboli_linia)
-                {
-                    x = i;
-                    y = j;
-                    warunek = true;
-                }
-                tablica_pom[i][j] = '_';
-            }
-        }
-        if(warunek == true)
-        {
-            break;
-        }
-    }
-}
+//                tablica_pom[i][j] = gracz2.znak;
 
-void mech::wyp_tab_pom()
-{
-    for(int i = 0; i < rozmiar_planszy; i++)
-    {
-        for (int j = 0; j < rozmiar_planszy; j++)
-        {
-            tablica_pom[i][j] = tablica[i][j];
-        }
-    }
-}
+//                for(int i = 0; i < rozmiar_planszy; i++)
+//                {
+//                    for (int j = 0; j < rozmiar_planszy; j++)
+//                    {
+//                        cout << tablica_pom[i][j] << '\t';
+//                    }
+//                    cout << endl;
+//                }
+//                cout << endl << "**********************************" << endl;
 
-void mech::wspolrzedne_ruchu_komputera()
-{
-    mech::wyp_tab_pom();
 
-    gracz_pomocniczy_2 = gracz2;
-    mech::analiza_ruchu();
-    if(warunek != true)
-    {
-        gracz_pomocniczy_2 = gracz1;
-        mech::analiza_ruchu();
-    }
-    if(warunek != true)
-    {
-        x = rand()%rozmiar_planszy;
-        y = rand()%rozmiar_planszy;
-    }
-    warunek = false;
-}
+//                zmienna_char = gracz2.znak;
+//                if(mech::sprawdzenie(tablica_pom, gracz2.znak) == true)
+//                {
+//                    x = i;
+//                    y = j;
+//                    tablica_pom[i][j] = '_';
+//                    return true;
+//                }
+
+//               tablica_pom[i][j] = gracz1.znak;
+//                zmienna_char = gracz1.znak;
+
+//                if(mech::sprawdzenie(tablica_pom, gracz1.znak) == true)
+//                {
+//                    x = i;
+//                    y = j;
+//                    tablica_pom[i][j] = '_';
+//                    return true;
+//                }
+//                tablica_pom[i][j] = '_';
+//            }
+//        }
+//    }
+//    return false;
+//}
 
 // G VS K
 
@@ -321,11 +329,6 @@ void mech::pelna_mechanika_gvsk()
 void mech::rozgrywka_gvsk()
 {
     liczba_ruchow = 0;
-
-    tablica_pom = new char *[rozmiar_planszy];
-    for (int i = 0; i < rozmiar_planszy; i++)
-        tablica_pom[i] = new char [rozmiar_planszy];
-
     for(int i = 0; i < rozmiar_planszy*rozmiar_planszy; i++)
     {
         system("cls");
@@ -336,33 +339,19 @@ void mech::rozgrywka_gvsk()
         if(gracz1.wartosc == 1)
         {
             cout << gracz1.nick << ", twoj ruch "<< gracz1.znak << endl;
-            cout << liczba_ruchow << endl;
-
-            mech::wspolrzedne_ruchu(x, y, rozmiar_planszy);
-            while(tablica[x-1][y-1]!=('_'))
-            {
-                cout << "Pole zajete!" << endl;
-                mech::wspolrzedne_ruchu(x, y, rozmiar_planszy);
-            }
-            tablica[x-1][y-1] = gracz1.znak;
+            mech::wspolrzedne_ruchu(gracz1);
         }
         else if(gracz1.wartosc == 0)
         {
-            mech::wspolrzedne_ruchu_komputera();
-            while(tablica[x][y] != ('_'))
-            {
-                mech::wspolrzedne_ruchu_komputera();
-            }
-            tablica[x][y] = gracz2.znak;
+            mech::wspolrzedne_ruchu_komputera(gracz2.znak, 0);
         }
 
         gracz_pomocniczy.wartosc = gracz1.wartosc;
         gracz1.wartosc = gracz2.wartosc;
         gracz2.wartosc = gracz_pomocniczy.wartosc;
 
-        suma = mech::sprawdzenie(tablica);
         liczba_ruchow++;
-        wynik();
+        mech::wynik();
     }
 }
 
@@ -372,21 +361,22 @@ void mech::rozgrywka_gvsk()
 
 
 
-int mech::sprawdzenie(char **tablica)
+bool mech::sprawdzenie(char **tablica, char znak)
 {
+
     suma = 0;
 
     for(int i = 0; i < rozmiar_planszy; i++)
     {
         for(int j = 0; j < rozmiar_planszy-1; j++)
         {
-            if(tablica[i][j]=='X')
+            if(tablica[i][j]== znak)
             {
                 if(suma<1)
                 {
                     suma = 1;
                 }
-                if(tablica[i][j+1] == ('X'))
+                if(tablica[i][j+1] == znak)
                 {
                     suma++;
                 }
@@ -395,37 +385,22 @@ int mech::sprawdzenie(char **tablica)
                     suma = 0;
                 }
             }
-            else if(tablica[i][j]=='O')
+            if(suma == ilosc_symboli_linia)
             {
-                if(suma>(-1))
-                {
-                    suma = -1;
-                }
-                if(tablica[i][j+1] == ('O'))
-                {
-                    suma--;
-                }
-                else
-                {
-                    suma = 0;
-                }
-            }
-            if(abs(suma)== ilosc_symboli_linia)
-            {
-                return suma;
+                return true;
             }
         }
         suma = 0;
 
         for(int j = 0; j < rozmiar_planszy-1; j++)
         {
-            if(tablica[j][i]=='X')
+            if(tablica[j][i]== znak)
             {
                 if(suma<1)
                 {
                     suma = 1;
                 }
-                if(tablica[j+1][i] == 'X')
+                if(tablica[j+1][i] == znak)
                 {
                     suma++;
                 }
@@ -434,24 +409,9 @@ int mech::sprawdzenie(char **tablica)
                     suma = 0;
                 }
             }
-            else if(tablica[j][i]=='O')
+            if(suma == ilosc_symboli_linia)
             {
-                if(suma > -1)
-                {
-                    suma = -1;
-                }
-                if(tablica[j+1][i] == 'O')
-                {
-                    suma--;
-                }
-                else
-                {
-                    suma = 0;
-                }
-            }
-            if(abs(suma)== ilosc_symboli_linia)
-            {
-                return suma;
+                return true;
             }
         }
         suma = 0;
@@ -463,13 +423,13 @@ int mech::sprawdzenie(char **tablica)
         {
             if(a+i>=0 && a+i<rozmiar_planszy)
             {
-                if(tablica[a+i][i] == 'X')
+                if(tablica[a+i][i] == znak)
                 {
                     if(suma < 1)
                     {
                         suma = 1;
                     }
-                    if(tablica[a+i+1][i+1] == 'X')
+                    if(tablica[a+i+1][i+1] == znak)
                     {
                         suma++;
                     }
@@ -478,112 +438,189 @@ int mech::sprawdzenie(char **tablica)
                         suma = 0;
                     }
                 }
-                else if(tablica[a+i][i] == 'O')
+                if(suma == ilosc_symboli_linia)
                 {
-                    if(suma > -1)
-                    {
-                        suma = -1;
-                    }
-                    if(tablica[a+i+1][i+1] == 'O')
-                    {
-                        suma--;
-                    }
-                    else
-                    {
-                        suma = 0;
-                    }
-                }
-                if(abs(suma)== ilosc_symboli_linia)
-                {
-                    return suma;
+                    return true;
                 }
             }
         }
         suma = 0;
     }
-
 
     for(int a = ilosc_symboli_linia-rozmiar_planszy; a<=rozmiar_planszy-ilosc_symboli_linia; a++)
     {
-        for(int i = 0; i < rozmiar_planszy; i++)
+        for(int i = 0; i < rozmiar_planszy-1; i++)
         {
             if(rozmiar_planszy-2-i+a>=0 && rozmiar_planszy-1-i+a<rozmiar_planszy)
             {
-                if(tablica[rozmiar_planszy-1-i+a][i] == 'X')
+                if(tablica[rozmiar_planszy-1-i+a][i] == znak)
                 {
                     if(suma < 1)
                     {
                         suma = 1;
                     }
-                    if(tablica[rozmiar_planszy-2-i+a][i+1] == 'X')
+                    if(tablica[rozmiar_planszy-2-i+a][i+1] == znak)
                     {
                         suma++;
-                        if(abs(suma)== ilosc_symboli_linia)
-                        {
-                            return suma;
-                        }
                     }
                     else
                     {
                         suma = 0;
-                    }
+                    }                 
                 }
-                else if(tablica[rozmiar_planszy-1-i+a][i] == 'O')
+                if(suma == ilosc_symboli_linia)
                 {
-                    if(suma > -1)
-                    {
-                        suma = -1;
-                    }
-                    if(tablica[rozmiar_planszy-2-i+a][i+1] == 'O')
-                    {
-                        suma--;
-                        if(abs(suma)== ilosc_symboli_linia)
-                        {
-                            return suma;
-                        }
-                    }
-                    else
-                    {
-                        suma = 0;
-                    }
+                    return true;
                 }
-
             }
         }
         suma = 0;
     }
+    return false;
 
 }
 void mech::wynik()
 {
-    if(liczba_ruchow == (rozmiar_planszy)*(rozmiar_planszy))
+    if(mech::sprawdzenie(tablica, gracz1.znak) == true)
+    {
+        MENU.zwyciestwo(gracz1);
+    }
+    else if(mech::sprawdzenie(tablica, gracz2.znak) == true)
+    {
+        MENU.zwyciestwo(gracz2);
+    }
+    else if(liczba_ruchow == rozmiar_planszy*rozmiar_planszy)
     {
         MENU.remis();
     }
-
-    if(suma == ilosc_symboli_linia)
-    {
-        if(gracz1.znak == 'X')
-        {
-            MENU.zwyciestwo(gracz1);
-        }
-        else if(gracz2.znak == 'X')
-        {
-            MENU.zwyciestwo(gracz2);
-        }
-    }
-    else if(suma == -(ilosc_symboli_linia))
-    {
-        if(gracz1.znak == 'O')
-        {
-            MENU.zwyciestwo(gracz1);
-        }
-        else if(gracz2.znak == 'O')
-        {
-            MENU.zwyciestwo(gracz2);
-        }
-    }
 }
 
+
+
+int mech::wspolrzedne_ruchu_komputera(char gracz, int poziom)
+{
+  int licznik = 0;
+
+  for(int i = 0; i < rozmiar_planszy; i++)
+  {
+    for(int j = 0; j < rozmiar_planszy; j++)
+    {
+      if(tablica[i][j] == '_')
+      {
+        tablica[i][j] = gracz;
+        x = i;
+        y = j;  // gdyby był remis
+        licznik++;     // zliczamy wolne pola
+
+        warunek = mech::sprawdzenie(tablica, gracz);
+        tablica[i][j] = '_';
+
+        if(warunek == true)
+        {
+            if(poziom == 0)
+            {
+                tablica[i][j] = gracz;
+            }
+            if(gracz == 'X')
+            {
+                return 1;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+
+//        if(gracz == 'X')
+//        {
+//            gracz = 'O';
+//        }
+//        else
+//        {
+//            gracz = 'X';
+//        }
+
+//        test = mech::sprawdzenie(tablica, gracz);
+//        tablica[i][j] = '_';
+
+//        if(gracz == 'X')
+//        {
+//            gracz = 'O';
+//        }
+//        else
+//        {
+//            gracz = 'X';
+//        }
+
+//        if(test == true)
+//        {
+//            if(poziom == 0)
+//            {
+//                tablica[i][j] = gracz;
+//            }
+//            if(gracz == 'X')
+//            {
+//                return -1;
+//            }
+//            else
+//            {
+//                return 1;
+//            }
+//        }
+      }
+    }
+  }
+
+  // sprawdzamy, czy jest remiS
+
+  if(licznik == 1)
+  {
+    if(poziom == 0)
+    {
+        tablica[x][y] = gracz;
+    }
+    return 0;
+  }
+
+  if(gracz == 'X')
+  {
+      maksymalna_wartosc_ruchu = -2;
+  }
+  else
+  {
+      maksymalna_wartosc_ruchu = 2;
+  }
+
+  for(int i = 0; i < rozmiar_planszy; i++)
+    for(int j = 0; j < rozmiar_planszy; j++)
+      if(tablica[i][j] == '_')
+      {
+        tablica[i][j] = gracz;
+
+        if(gracz == 'X')
+        {
+            gracz = 'O';
+        }
+        else
+        {
+            gracz = 'X';
+        }
+        wartosc_ruchu = mech::wspolrzedne_ruchu_komputera(gracz, poziom + 1);
+        tablica[i][j] = '_';
+
+        if(((gracz == 'X') && (wartosc_ruchu > maksymalna_wartosc_ruchu)) || ((gracz == 'O') && (wartosc_ruchu < maksymalna_wartosc_ruchu)))
+        {
+          maksymalna_wartosc_ruchu = wartosc_ruchu;
+          x = i;
+          y = j;
+        }
+      }
+
+   if(poziom == 0)
+   {
+       tablica[x][y] = gracz;
+   }
+   return maksymalna_wartosc_ruchu;
+}
 
 
