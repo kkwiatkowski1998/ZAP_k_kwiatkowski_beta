@@ -62,6 +62,7 @@ void menu::start_exit()
         menu::okno_powitalne();
         menu::start_exit();
     }
+
 }
 
 void menu::gracz_komputer()
@@ -123,6 +124,7 @@ void menu::podaj_wymiary_planszy(int &rozmiar_planszy)
     {
         menu::podaj_wymiary_planszy(rozmiar_planszy);
     }
+    cout << "podaj_wymiary_planszy" << endl;
 }
 
 void menu::podaj_ilosc_symboli(int &ilosc_symboli_linia, int &rozmiar_planszy)
@@ -133,6 +135,7 @@ void menu::podaj_ilosc_symboli(int &ilosc_symboli_linia, int &rozmiar_planszy)
     {
         menu::podaj_ilosc_symboli(ilosc_symboli_linia, rozmiar_planszy);
     }
+    cout << "podaj_ilosc_symboli" << endl;
 }
 
 string menu::nick(string numer)

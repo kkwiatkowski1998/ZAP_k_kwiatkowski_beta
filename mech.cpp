@@ -44,6 +44,8 @@ void mech::nowa_plansza()
             tablica[i][j]= '_';
         }
     }
+
+    cout << "nowa_plansza" <<endl;
 }
 
 void mech::usuwanie_dynamicznych()
@@ -51,6 +53,7 @@ void mech::usuwanie_dynamicznych()
     for (int i = 0; i < rozmiar_planszy; i++)
         delete [] tablica[i];
     delete [] tablica;
+    cout << "usuwanie_dynamicznych" << endl;
 }
 
 void mech::drukuj_plansze()
@@ -63,6 +66,7 @@ void mech::drukuj_plansze()
         }
         cout << endl << endl;
     }
+    cout << "drukuj_plansze" <<endl;
 }
 
 // GRACZE
@@ -105,6 +109,8 @@ void mech::dane_graczy()
     default:
         break;
     }
+
+    cout << "dane_graczy" <<endl;
 }
 
 //GRACZ VS GRACZ
@@ -115,7 +121,7 @@ void mech::pelna_mechanika_gg()
     mech::ilosc_symboli();
     mech::nowa_plansza();
     mech::rozgrywka_gg();
-
+    cout << "pelna_mechanika_gg" << endl;
 }
 void mech::dane_testowe()
 {
@@ -125,7 +131,7 @@ void mech::dane_testowe()
     gracz2.znak = 'X';
     gracz1.nick = "KOLKO";
     gracz2.nick = "KRZYZYK";
-
+    cout << "dane_testowe" << endl;
 }
 void mech::pelna_mechanika_test()
 {
@@ -134,6 +140,8 @@ void mech::pelna_mechanika_test()
     mech::ilosc_symboli();
     mech::nowa_plansza();
     mech::rozgrywka_test();
+
+    cout << "pelna_mechanika_test" << endl;
 }
 
 void mech::rozgrywka_test()
@@ -142,7 +150,7 @@ void mech::rozgrywka_test()
     srand(time(0));
     for(int i = 0; i < rozmiar_planszy*rozmiar_planszy; i++)
     {
-        system("cls");
+//        system("cls");
 
         MENU.okno_powitalne();
 
@@ -171,6 +179,7 @@ void mech::rozgrywka_test()
 
         liczba_ruchow++;
         mech::wynik();
+        cout << "rozgrywka_test" <<endl;
     }
 }
 
@@ -324,6 +333,8 @@ void mech::pelna_mechanika_gvsk()
     mech::ilosc_symboli();
     mech::nowa_plansza();
     mech::rozgrywka_gvsk();
+    cout << "pelna_mechanika_gvsk" << endl;
+
 }
 
 void mech::rozgrywka_gvsk()
@@ -331,7 +342,7 @@ void mech::rozgrywka_gvsk()
     liczba_ruchow = 0;
     for(int i = 0; i < rozmiar_planszy*rozmiar_planszy; i++)
     {
-        system("cls");
+//        system("cls");
 
         MENU.okno_powitalne();
         drukuj_plansze();
@@ -352,6 +363,7 @@ void mech::rozgrywka_gvsk()
 
         liczba_ruchow++;
         mech::wynik();
+        cout << "rozgrywka_gvsk" << endl;
     }
 }
 
@@ -415,13 +427,14 @@ bool mech::sprawdzenie(char **tablica, char znak)
             }
         }
         suma = 0;
+
     }
 
     for(int a = ilosc_symboli_linia-rozmiar_planszy; a<=rozmiar_planszy-ilosc_symboli_linia; a++)
     {
         for(int i = 0; i < rozmiar_planszy-1; i++)
         {
-            if(a+i>=0 && a+i<rozmiar_planszy)
+            if(a+i>=0 && a+i+1<rozmiar_planszy)
             {
                 if(tablica[a+i][i] == znak)
                 {
@@ -429,6 +442,7 @@ bool mech::sprawdzenie(char **tablica, char znak)
                     {
                         suma = 1;
                     }
+              cout << a+i+1 << '\t' << i+1 << '\t' << rozmiar_planszy << endl;
                     if(tablica[a+i+1][i+1] == znak)
                     {
                         suma++;
@@ -466,7 +480,7 @@ bool mech::sprawdzenie(char **tablica, char znak)
                     else
                     {
                         suma = 0;
-                    }                 
+                    }
                 }
                 if(suma == ilosc_symboli_linia)
                 {
@@ -481,21 +495,24 @@ bool mech::sprawdzenie(char **tablica, char znak)
 }
 void mech::wynik()
 {
+    cout << "wynik"<<endl;
     if(mech::sprawdzenie(tablica, gracz1.znak) == true)
     {
+        cout << "wynik" << endl;
         MENU.zwyciestwo(gracz1);
     }
     else if(mech::sprawdzenie(tablica, gracz2.znak) == true)
     {
+        cout << "wynik" << endl;
         MENU.zwyciestwo(gracz2);
     }
     else if(liczba_ruchow == rozmiar_planszy*rozmiar_planszy)
     {
+        cout << "wynik" << endl;
         MENU.remis();
     }
+
 }
-
-
 
 int mech::wspolrzedne_ruchu_komputera(char gracz, int poziom)
 {
@@ -620,6 +637,8 @@ int mech::wspolrzedne_ruchu_komputera(char gracz, int poziom)
    {
        tablica[x][y] = gracz;
    }
+//   cout << "wspolrzedne_ruchu_komputera" << endl;
+
    return maksymalna_wartosc_ruchu;
 }
 
